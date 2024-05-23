@@ -1,24 +1,30 @@
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 const prisma = require('../models')
 const customError = require('../utils/customError')
+const tryCatch = require('../utils/tryCatch')
 
-module.exports.register = async (req,res,next)=>{
+module.exports.register = tryCatch (async (req,res,next)=>{
 	const {username, password, confirmPassword, email} = req.body
-	try {
 		// รับ body {username, password, confirmPassword, email}
 		console.log(username)
 
 		// validation
 		// if( !username || !password || !confirmPassword) {
 		if( !(username && password && confirmPassword)) {
-			// const error = new Error("Fill all Input")
-			// error.statusCode = 400
 			return next(customError('Fill all Input', 400))
 		}
 		if(password !== confirmPassword) {
 			throw(customError("check confirmPassword", 400))
 		}
-		
+		const userExist = prisma.user.findUnique({
+			where : { username : username} 
+		})
+
+		if(userExist) {
+			throw(customError('user already exist', 400))
+		}
+
 		// hash password
 		const hashedPassword = await bcrypt.hash(password, 10)
 		const data = {
@@ -33,13 +39,40 @@ module.exports.register = async (req,res,next)=>{
 		})
 		console.log(rs)
 		res.json({msg: 'Register Sucessful'})
+})
 
-	}catch(err){
+module.exports.login = async (req, res, next) => {
+	try {
+		const {username, password} = req.body
+		// validation
+		if( !(username && password )) {
+			throw(customError('Fill all Input', 400))
+		}
+		const targetUser = await prisma.user.findUnique({
+			where : { username : username} 
+		})
+		// find username in prisma.user
+		if( !targetUser) {
+			throw(customError('Invalid login',400))
+		}
+		// check password
+		const pwOk = await bcrypt.compare(password, targetUser.password)
+		if(!pwOk) {
+			throw(customError('Invalid login',400))
+		}
+		// create jwt-token
+			// make payload = { id }
+			// jwt.sign + {expiresIn : '7d'}
+		const payload = {id : targetUser.id}
+		const token = jwt.sign(payload, process.env.JWT_SECRET, {
+			expiresIn : '7d'
+		})
+		console.log(token)
+		// responde jwt-token
+		res.json({token: token})
+	}catch(err) {
 		next(err)
 	}
-}
-module.exports.login = (req, res, next) => {
-	res.json({msg: 'in login'})
 }
 
 module.exports.me = (req, res, next) => {
