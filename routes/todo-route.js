@@ -1,7 +1,11 @@
 const express = require('express')
 const router = express.Router()
 
-router.get('/', ()=>{})
+router.get('/', (req,res,next)=> {
+	console.log('in todoRoute get /')
+	console.log(req.user)
+	res.json('Get Todos')
+})
 router.post('/', ()=>{})
 router.put('/:id', ()=>{})
 router.delete('/:id', ()=>{})

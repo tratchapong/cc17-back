@@ -41,39 +41,35 @@ module.exports.register = tryCatch (async (req,res,next)=>{
 		res.json({msg: 'Register Sucessful'})
 })
 
-module.exports.login = async (req, res, next) => {
-	try {
-		const {username, password} = req.body
-		// validation
-		if( !(username && password )) {
-			throw(customError('Fill all Input', 400))
-		}
-		const targetUser = await prisma.user.findUnique({
-			where : { username : username} 
-		})
-		// find username in prisma.user
-		if( !targetUser) {
-			throw(customError('Invalid login',400))
-		}
-		// check password
-		const pwOk = await bcrypt.compare(password, targetUser.password)
-		if(!pwOk) {
-			throw(customError('Invalid login',400))
-		}
-		// create jwt-token
-			// make payload = { id }
-			// jwt.sign + {expiresIn : '7d'}
-		const payload = {id : targetUser.id}
-		const token = jwt.sign(payload, process.env.JWT_SECRET, {
-			expiresIn : '7d'
-		})
-		console.log(token)
-		// responde jwt-token
-		res.json({token: token})
-	}catch(err) {
-		next(err)
+module.exports.login = tryCatch(async (req, res, next) => {
+	const {username, password} = req.body
+	// validation
+	if( !(username && password )) {
+		throw(customError('Fill all Input', 400))
 	}
-}
+	const targetUser = await prisma.user.findUnique({
+		where : { username : username} 
+	})
+	// find username in prisma.user
+	if( !targetUser) {
+		throw(customError('Invalid login',400))
+	}
+	// check password
+	const pwOk = await bcrypt.compare(password, targetUser.password)
+	if(!pwOk) {
+		throw(customError('Invalid login',400))
+	}
+	// create jwt-token
+		// make payload = { id }
+		// jwt.sign + {expiresIn : '7d'}
+	const payload = {id : targetUser.id}
+	const token = jwt.sign(payload, process.env.JWT_SECRET, {
+		expiresIn : '7d'
+	})
+	console.log(token)
+	// responde jwt-token
+	res.json({token: token})
+})
 
 module.exports.me = (req, res, next) => {
 	res.json({msg : 'in getMe'})
