@@ -15,13 +15,14 @@ module.exports = async (req, res, next) => {
 		// check token
 		const token = authorization.split(' ')[1]
 		const payload = jwt.verify(token, process.env.JWT_SECRET)
-		console.log(payload)
+		// console.log(payload)
+		
 		// use payload find user in prisma.user
 		const user = await prisma.user.findUnique({
 			where : { id : payload.id}
 		})
 		delete user.password
-		console.log(user)
+		// console.log(user)
 		req.user = user
 		next()
 	}catch(err){

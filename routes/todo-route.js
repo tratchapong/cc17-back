@@ -1,10 +1,12 @@
 const express = require('express')
+const authenticate = require('../middlewares/authenticate')
 const router = express.Router()
+authenticate
 
 router.get('/', (req,res,next)=> {
 	console.log('in todoRoute get /')
 	console.log(req.user)
-	res.json('Get Todos')
+	res.json({msg : `Hello, ${req.user.username}`})
 })
 router.post('/', ()=>{})
 router.put('/:id', ()=>{})
