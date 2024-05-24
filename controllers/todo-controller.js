@@ -6,5 +6,5 @@ module.exports.getTodoByUser = tryCatch( async (req, res, next) => {
 	const todos = await prisma.todo.findMany({
 		where : { userId : req.user.id}
 	})
-	res.json(todos)
+	res.json({todos : todos})
 } )
