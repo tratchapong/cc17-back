@@ -9,7 +9,8 @@ module.exports = async (req, res, next) => {
 		if(!authorization) {
 			throw(customError('UnAuthorized',401))
 		}
-		if(!authorization.startsWith('Bearer ')){
+		// if(!authorization.startsWith('Bearer ')){
+		if( !/^Bearer /.test(authorization)){
 			throw(customError('UnAuthorized',401))
 		}
 		// check token
