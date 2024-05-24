@@ -1,13 +1,10 @@
 const express = require('express')
 const authenticate = require('../middlewares/authenticate')
+const { getTodoByUser } = require('../controllers/todo-controller')
 const router = express.Router()
-authenticate
 
-router.get('/', (req,res,next)=> {
-	console.log('in todoRoute get /')
-	console.log(req.user)
-	res.json({msg : `Hello, ${req.user.username}`})
-})
+
+router.get('/', getTodoByUser)
 router.post('/', ()=>{})
 router.put('/:id', ()=>{})
 router.delete('/:id', ()=>{})

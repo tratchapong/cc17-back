@@ -72,7 +72,7 @@ module.exports.login = tryCatch(async (req, res, next) => {
 })
 
 module.exports.me = (req, res, next) => {
-	res.json({msg : 'in getMe'})
+	res.json({user : req.user})
 }
 
 // module.exports = { register, login, me }
