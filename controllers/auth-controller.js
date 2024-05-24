@@ -17,7 +17,7 @@ module.exports.register = tryCatch (async (req,res,next)=>{
 		if(password !== confirmPassword) {
 			throw(customError("check confirmPassword", 400))
 		}
-		const userExist = prisma.user.findUnique({
+		const userExist = await prisma.user.findUnique({
 			where : { username : username} 
 		})
 
